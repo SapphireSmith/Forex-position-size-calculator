@@ -5,7 +5,7 @@ const Calculator = () => {
     const [balance, setBalance] = useState('100000');
     const [risk, setRisk] = useState('1');
     const [stopLoss, setStopLoss] = useState('');
-    const [pair, setPair] = useState('EURUSD');
+    const [pair, setPair] = useState('USDJPY');
     const [result, setResult] = useState(null);
     const [exchangeRates, setExchangeRates] = useState({});
 
