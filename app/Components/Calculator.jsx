@@ -1,12 +1,31 @@
 "use client"
-import React,{useState} from 'react'
+import React, { useState, useEffect } from 'react'
 
 const Calculator = () => {
     const [balance, setBalance] = useState('100000');
-    const [risk, setRisk] = useState('');
+    const [risk, setRisk] = useState('1');
     const [stopLoss, setStopLoss] = useState('');
     const [pair, setPair] = useState('EURUSD');
     const [result, setResult] = useState(null);
+    const [exchangeRates, setExchangeRates] = useState({});
+
+    const API_KEY = '8eed46ef0ac3fadc9a55056c18090bcd';
+
+    // Fetch live exchange rates for both pairs
+    useEffect(() => {
+        fetch(`https://api.exchangerate.host/live?access_key=${API_KEY}&source=USD&currencies=EUR,JPY&format=1`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+
+                const rates = {
+                    EURUSD: data.quotes?.USDEUR ? 1 / data.quotes.USDEUR : 1.0,
+                    USDJPY: data.quotes?.USDJPY || null
+                };
+                setExchangeRates(rates);
+            })
+            .catch(err => console.error('Exchange rate error:', err));
+    }, []);
 
     const calculatePositionSize = () => {
         const accBalance = parseFloat(balance);
@@ -16,7 +35,16 @@ const Calculator = () => {
         if (!accBalance || !riskPercent || !stopLossPips) return;
 
         const riskAmount = accBalance * riskPercent;
-        const pipValue = pair === 'EURUSD' ? 10 : 9.13; // per standard lot
+        let pipValue;
+
+        if (pair === 'EURUSD') {
+            pipValue = 10; // hardcoded, $10 per pip per lot
+        } else if (pair === 'USDJPY') {
+            const rate = exchangeRates.USDJPY;
+            if (!rate) return;
+            pipValue = (0.01 / rate) * 100000;
+        }
+
         const lotSize = riskAmount / (stopLossPips * pipValue);
         const units = lotSize * 100000;
 
@@ -76,7 +104,9 @@ const Calculator = () => {
                         USD/JPY
                     </button>
                 </div>
-
+                {
+                    pair === "USDJPY" ? <p>{exchangeRates.USDJPY}</p> : ''
+                }
                 <button
                     onClick={calculatePositionSize}
                     className="w-full bg-blue-600 text-white py-2 rounded"
