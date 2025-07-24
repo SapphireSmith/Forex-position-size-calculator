@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react'
 
 const Calculator = () => {
-    const [balance, setBalance] = useState('100000');
-    const [risk, setRisk] = useState('1');
+    const [balance, setBalance] = useState('5000');
+    const [risk, setRisk] = useState('0.80');
     const [stopLoss, setStopLoss] = useState('');
-    const [pair, setPair] = useState('USDJPY');
+    const [pair, setPair] = useState('EURUSD');
     const [result, setResult] = useState(null);
     const [exchangeRates, setExchangeRates] = useState({});
 
